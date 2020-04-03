@@ -1,0 +1,8 @@
+prefix=/home/yqz/matplot_new/devel
+
+Name: sailing_robot
+Description: Description of sailing_robot
+Version: 0.0.0
+Cflags: -I/home/yqz/matplot_new/devel/include
+Libs: -L/home/yqz/matplot_new/devel/lib 
+Requires: rospy std_msgs sensor_msgs message_runtime

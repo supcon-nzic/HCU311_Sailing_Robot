@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC   -shared -Wl,-soname,libgtest.so -o libgtest.so CMakeFiles/gtest.dir/src/gtest-all.cc.o  -L/root/HCU-311/sailing_robot_control/build/gtest/gtest/src -lpthread -Wl,-rpath,/root/HCU-311/sailing_robot_control/build/gtest/gtest/src 

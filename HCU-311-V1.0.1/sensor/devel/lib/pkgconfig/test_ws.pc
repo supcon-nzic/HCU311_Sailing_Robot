@@ -1,0 +1,8 @@
+prefix=/root/HCU-311/sensor/devel
+
+Name: test_ws
+Description: Description of test_ws
+Version: 0.0.0
+Cflags: 
+Libs: -L/root/HCU-311/sensor/devel/lib 
+Requires: 

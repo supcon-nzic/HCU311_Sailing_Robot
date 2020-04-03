@@ -1,0 +1,2 @@
+sailing_robot
+-DCATKIN_DEVEL_PREFIX=/home/yqz/HCU-311-V1.0.0/simulator/sailing_robot_master/devel -DCMAKE_INSTALL_PREFIX=/home/yqz/HCU-311-V1.0.0/simulator/sailing_robot_master/install -G Unix Makefiles

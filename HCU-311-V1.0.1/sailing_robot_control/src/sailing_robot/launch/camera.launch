@@ -1,0 +1,36 @@
+<launch>
+    <!--
+    General test file to launch simulator
+    -->
+
+    <!--
+    Parameters
+    -->
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/calibration_blackpython.yaml" ns="/calibration"
+              command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/rudder_settings.yaml" command="load"/>
+    <!--rosparam file="$(find sailing_robot)/launch/parameters/sail_settings.yaml" command="load"/-->
+
+    <!--rosparam file="$(find sailing_robot)/launch/parameters/hide_and_seek.yaml" command="load"/-->
+
+    <!--rosparam file="$(find sailing_robot)/launch/parameters/station_keeping.yaml" command="load"/-->
+
+    <!--rosparam file="$(find sailing_robot)/launch/parameters/simulator.yaml" command="load"/-->
+
+    <param name="log_name" value="simulator_test"/>
+
+    <!--
+    Nodes
+    -->
+    <node name = "actuator_driver_rudder" pkg="sailing_robot" type = "actuator_driver_rudder" />
+    <!--node name = "actuator_driver_sail" pkg="sailing_robot" type = "actuator_demand_sail" /-->
+
+    <node name="camera_detected" pkg="sailing_robot" type="camera_detected"/>
+
+    <node name="ball_node" pkg="ball_detected" type="ball_node"/>
+    <!--node name="debugging_dashboard" pkg="sailing_robot" type="debugging_dashboard"/-->
+    <!--node name="bag_record" pkg="rosbag" type="record" respawn="true" args="-a -o /home/yuqizhi/zheda/src/sailing_robot"/-->
+</launch>

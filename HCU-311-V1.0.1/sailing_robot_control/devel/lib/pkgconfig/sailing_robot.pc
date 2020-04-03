@@ -1,0 +1,8 @@
+prefix=/root/HCU-311/sailing_robot_control/devel
+
+Name: sailing_robot
+Description: Description of sailing_robot
+Version: 0.0.0
+Cflags: -I/root/HCU-311/sailing_robot_control/devel/include
+Libs: -L/root/HCU-311/sailing_robot_control/devel/lib 
+Requires: rospy std_msgs sensor_msgs message_runtime

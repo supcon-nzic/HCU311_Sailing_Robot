@@ -1,0 +1,6 @@
+set(sailing_robot_SETUP_PY_VERSION "0.0.0")
+set(sailing_robot_SETUP_PY_SCRIPTS "")
+set(sailing_robot_SETUP_PY_PACKAGES "sailing_robot")
+set(sailing_robot_SETUP_PY_PACKAGE_DIRS "src/sailing_robot")
+set(sailing_robot_SETUP_PY_MODULES "")
+set(sailing_robot_SETUP_PY_MODULE_DIRS "")

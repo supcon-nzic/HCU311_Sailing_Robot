@@ -1,0 +1,36 @@
+#!/usr/bin/env python
+import serial
+import rospy
+from std_msgs.msg import Float32
+from std_msgs.msg import Float64
+from std_msgs.msg import String
+import smbus
+import time
+from collections import deque
+#MAXNUM = 10
+bus=smbus.SMBus(1)#i2c read from dianweiqi
+def talker():
+    pub_wind=rospy.Publisher("wind_direction_apparent",Float64,queue_size=10)
+    rospy.init_node('wind_direction_apparent', anonymous=True)
+    rate = rospy.Rate(rospy.get_param("config/rate"))
+       
+# deque_wind_direction = deque(maxlen = MAXNUM)
+   # sum_wind_direction = 0
+    while not rospy.is_shutdown():
+	wind_direction_apparent=bus.read_byte_data(0x48,0x40)/255.0*360.0
+     #   if len(deque_wind_direction) >= MAXNUM :
+	#	sum_wind_direction -= deque_wind_direction.popleft()
+	#deque_wind_direction.append(wind_direction_apparent)
+	#sum_wind_direction += wind_direction_apparent
+	#wind_direction_apparent = sum_wind_direction / len(deque_wind_direction)
+	wind_direction_apparent=wind_direction_apparent-60-250-75
+        if wind_direction_apparent<0:
+            wind_direction_apparent=360+wind_direction_apparent
+	pub_wind.publish(wind_direction_apparent)
+        rate.sleep()
+
+if __name__ == '__main__':
+    try:
+        talker()
+    except rospy.ROSInterruptException:
+        pass

@@ -1,0 +1,3 @@
+1 修复了摄像头svm_data无法从参数文件读取数据的问题
+2 硬件添加JY901 软件添加与JY901有关的程序，configure_jy901.py（配置JY901输出）  uart0_to_uart5.py（串口0读取GPS串口5转发）
+添加GPS和IMU解算程序ser_gps_jy901

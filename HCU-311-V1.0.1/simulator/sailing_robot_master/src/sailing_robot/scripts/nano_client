@@ -1,0 +1,124 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# nano_client
+
+import rospy
+import socket
+import json
+import math
+import time
+from std_msgs.msg import String, Float64, Float32
+from sensor_msgs.msg import NavSatFix
+
+HOST = '192.168.137.100'
+PORT = 50001
+address = (HOST, PORT)
+is_exit = False
+
+
+class Nano_Client():
+
+    def __init__(self):
+        global address
+        global is_exit
+
+        """ Publish position based on velocity and heading
+        """
+        self.heading_pub = rospy.Publisher('heading', Float32, queue_size = 10)
+        self.position_pub = rospy.Publisher('position', NavSatFix, queue_size = 10)
+        self.velocity_pub = rospy.Publisher('velocity', Float64, queue_size = 10)
+        self.wind_direction_apparent_pub = rospy.Publisher("wind_direction_apparent", Float64, queue_size = 10)
+
+        self.pwm_data = dict()
+        self.pwm_data['rudder_pwm'] = 1500
+        self.pwm_data['sail_pwm'] = 1500
+        # set mid
+
+        self.rudder_pwm_sub = rospy.Subscriber('debug_rudder_pwm', Float32, self.rudderservoPWMcontrol)
+        self.sail_pwm_sub = rospy.Subscriber('debug_sailsheet_pwm', Float32, self.sailservoPWMcontrol)
+
+        self.rate = rospy.Rate(10)
+        self.absolute_wind_direction = rospy.get_param('nav/absolute_wind_direction', 0)
+
+        self.heading = Float32()
+        self.position = NavSatFix()
+        self.velocity = Float64()
+        self.wind_direction_apparent = Float64()
+        self.wind_direction_apparent_sig = 6
+        self.wind_direction_apparent_len = 20
+        self.wind_direction_apparent_list = []
+        self.wind_direction_apparent_weight_list = [math.exp(-i ** 2 / (2 * self.wind_direction_apparent_sig ** 2)) / (
+                self.wind_direction_apparent_sig * (2 * math.pi) ** 0.5) for i in
+                                                    range(self.wind_direction_apparent_len)]
+
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect(address)
+
+        while not rospy.is_shutdown():
+            try:
+                jpwm_data = json.dumps(self.pwm_data)
+                sock.sendall(jpwm_data)
+
+                sensor_data = sock.recv(1024)
+                jsensor_data = json.loads(sensor_data)
+                print "Recv: ", jsensor_data
+                self.heading.data = jsensor_data['heading'] - 17.0
+                self.position.latitude = jsensor_data['latitude'] - 0.0000235
+                self.position.longitude = jsensor_data['longitude'] + 0.00004712
+                self.velocity.data = jsensor_data['velocity']
+                if len(self.wind_direction_apparent_list) >= self.wind_direction_apparent_len:
+                    self.wind_direction_apparent_list.pop()
+                absolute_wind_direction = jsensor_data['wind_direction_apparent'] + self.heading.data
+                if absolute_wind_direction > 360:
+                    absolute_wind_direction -= 360
+                self.wind_direction_apparent_list.insert(0, absolute_wind_direction)
+                # real wind_direction
+                # self.wind_direction_apparent.data = self.calculate_wind_direction_apparent()
+
+                # defined wind_direction in default.yaml
+                self.wind_direction_apparent.data = 30 - self.heading.data
+
+                if self.wind_direction_apparent.data < 0:
+                    self.wind_direction_apparent.data += 360.0
+
+                if self.heading.data < 0:
+                    self.heading.data += 360.0
+
+                print(rospy.get_time())
+                self.msgs_publisher()  # time.sleep(0.1)
+            except BaseException as e:
+                print(e)
+
+        sock.close()
+
+    def calculate_wind_direction_apparent(self):
+        wind_direction_apparent = sum(
+            [wind_direction_apparent * self.wind_direction_apparent_weight_list[i] for i, wind_direction_apparent in
+             enumerate(self.wind_direction_apparent_list)]) / sum(
+            self.wind_direction_apparent_weight_list[:len(self.wind_direction_apparent_list)]) - self.heading.data
+        if wind_direction_apparent < 0:
+            wind_direction_apparent += 360
+        elif wind_direction_apparent > 360:
+            wind_direction_apparent -= 360
+        return wind_direction_apparent
+
+    def rudderservoPWMcontrol(self, rudder_pwm_msg):
+        self.pwm_data['rudder_pwm'] = rudder_pwm_msg.data
+
+    def sailservoPWMcontrol(self, sail_pwm_msg):
+        self.pwm_data['sail_pwm'] = sail_pwm_msg.data
+
+    def msgs_publisher(self):
+        self.heading_pub.publish(self.heading)
+        # self.position_pub.publish(self.position)
+        self.velocity_pub.publish(self.velocity)
+        self.wind_direction_apparent_pub.publish(self.wind_direction_apparent)
+        self.rate.sleep()
+
+
+if __name__ == '__main__':
+    try:
+        rospy.init_node("nano_client", anonymous = True)
+        Nano_Client()
+    except rospy.ROSInterruptException:
+        pass

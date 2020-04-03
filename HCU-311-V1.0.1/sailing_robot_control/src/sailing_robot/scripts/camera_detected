@@ -1,0 +1,82 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# camera detected
+
+import rospy
+import math
+from std_msgs.msg import Bool,Int32,Int16
+from ball_detected.msg import image
+import sailing_robot.pid_control as _PID
+
+pub_rudder = rospy.Publisher('rudder_control', Int16, queue_size = 10)  # Use UInt 16 here to minimize the memory use
+rudder = rospy.get_param('rudder')
+controller = _PID.PID(rudder['control']['Kp'], rudder['control']['Ki'], rudder['control']['Kd'], rudder['maxAngle'],
+                      -rudder['maxAngle'])
+
+class camera_detected():
+	"""docstring for camera_detected"""
+	def __init__(self):
+
+		#detected threshold
+		self.threshold = 80
+		#the positon of boat in the picture
+		self.boat_position_x = 320
+		self.boat_position_y = 0
+		#the topic of picture
+		rospy.Subscriber('ball_position', image, self.update_ball_postion)
+		self.ball_position_x = 0
+		self.ball_position_y = 0
+		rospy.Subscriber('camera_detected', Bool, self.update_camera_detected)
+		self.camera_detected = False
+		rospy.Subscriber('ball_area', Int32, self.update_ball_area)
+		self.ball_area = 0
+
+		self.rate = rospy.Rate(rospy.get_param("config/rate"))  #10HZ
+		self.caculated_boat_and_ball_angle()
+
+	def update_ball_postion(self,msg):
+		self.ball_position_x = msg.x
+		self.ball_position_y = msg.y
+
+	def update_camera_detected(self,msg):
+		self.camera_detected = msg.data
+
+	def update_ball_area(self,msg):
+		self.ball_area = msg.data
+
+# def set_rudder(self.boat_and_ball_angle):
+#     rawangle = -controller.update_PID(self.boat_and_ball_angle)
+#     angle = _PID.saturation(rawangle, -rudder['maxAngle'], rudder['maxAngle'])
+#     pub_rudder.publish(int(angle))
+
+	def caculated_boat_and_ball_angle(self):
+
+		while not rospy.is_shutdown():
+			
+			if self.camera_detected == True:
+				self.x = self.ball_position_x - self.boat_position_x
+				self.y = self.ball_position_y - self.boat_position_y
+				#self.boat_and_ball_angle = math.degrees(math.atan2(self.x, self.y)) % 360
+				rospy.logwarn('self.x'+str(self.x))
+				self.boat_and_ball_angle = 0.25*self.x
+				rospy.logwarn('self.boat_and_ball_angle'+str(self.boat_and_ball_angle))
+				#how to call set_rudder
+				rawangle = -controller.update_PID(self.boat_and_ball_angle)
+				angle = _PID.saturation(rawangle, -rudder['maxAngle'], rudder['maxAngle'])
+	     		#the area greater than threshold
+				if self.ball_area > self.threshold:
+					angle = 40
+				pub_rudder.publish(int(angle))
+				#self.camera_detected = False
+				#rospy.logwarn('detected')
+			else:
+				rospy.logwarn('no detected')
+
+			self.rate.sleep()
+
+if __name__ == '__main__':
+	try:
+		rospy.init_node("camera_detected", anonymous = True)
+		camera_detected()
+	except rospy.ROSInterruptException:
+		pass

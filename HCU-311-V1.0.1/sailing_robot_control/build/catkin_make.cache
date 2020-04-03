@@ -1,0 +1,2 @@
+ball_detected:sailing_robot
+-DCATKIN_DEVEL_PREFIX=/root/HCU-311/sailing_robot_control/devel -DCMAKE_INSTALL_PREFIX=/root/HCU-311/sailing_robot_control/install -G Unix Makefiles

@@ -1,0 +1,1 @@
+/usr/bin/cc  -O3 -DNDEBUG   CMakeFiles/apriltag_demo.dir/example/apriltag_demo.c.o  -o apriltag_demo -rdynamic lib/libapriltag.so.3.1.0 -lpthread -lm -Wl,-rpath,/root/HCU-311/camera/apriltag-master/lib: 

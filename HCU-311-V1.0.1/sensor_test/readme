@@ -1,0 +1,4 @@
+serson_test文件夹中的代码是传感器采集原始数据和简单的测试代码
+           sensor_imu.py读取IMU原始数据
+           sensor_adc.py读取风向标原始数据
+           sensor_motorPo.py直接给舵机固定Pwm让其转动

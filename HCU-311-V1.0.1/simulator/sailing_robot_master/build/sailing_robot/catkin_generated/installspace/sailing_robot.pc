@@ -1,0 +1,8 @@
+prefix=/home/yqz/HCU-311-V1.0.0/simulator/sailing_robot_master/install
+
+Name: sailing_robot
+Description: Description of sailing_robot
+Version: 0.0.0
+Cflags: -I/home/yqz/HCU-311-V1.0.0/simulator/sailing_robot_master/install/include
+Libs: -L/home/yqz/HCU-311-V1.0.0/simulator/sailing_robot_master/install/lib 
+Requires: rospy std_msgs sensor_msgs message_runtime

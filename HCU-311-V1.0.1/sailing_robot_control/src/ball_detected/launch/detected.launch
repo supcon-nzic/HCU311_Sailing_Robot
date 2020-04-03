@@ -1,0 +1,13 @@
+<launch>
+ 	<!--
+	Parameters
+	-->
+	<rosparam file="$(find ball_detected)/config/parameters.yaml" command="load"/>
+	<!--rosparam param="a_list" >[1.0, 2.0, 3.0, 4.0]</rosparam-->
+
+	<!--
+	node
+	-->
+	<node name = "ball_node" pkg = "ball_detected" type = "ball_node" output = "screen"/>
+
+</launch>

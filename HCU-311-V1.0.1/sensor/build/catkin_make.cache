@@ -1,0 +1,2 @@
+test_ws
+-DCATKIN_DEVEL_PREFIX=/root/HCU-311/sensor/devel -DCMAKE_INSTALL_PREFIX=/root/HCU-311/sensor/install -G Unix Makefiles

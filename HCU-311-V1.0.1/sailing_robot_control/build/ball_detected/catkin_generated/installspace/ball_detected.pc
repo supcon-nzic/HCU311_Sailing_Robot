@@ -1,0 +1,8 @@
+prefix=/root/HCU-311/sailing_robot_control/install
+
+Name: ball_detected
+Description: Description of ball_detected
+Version: 0.0.0
+Cflags: -I/root/HCU-311/sailing_robot_control/install/include
+Libs: -L/root/HCU-311/sailing_robot_control/install/lib 
+Requires: 
