@@ -97,7 +97,7 @@ class Connect():
         bys = b''
         for i in range(0,8):
             bys+=self.serialFd.read()
-        data = struct.unpack('<4h',bys)
+        data = struct.unpack('<4H',bys)
         data = np.array(data[:3])
         data = 360 -(data*180/32768+1)
         self.angle = data
