@@ -68,11 +68,11 @@ int main(int argc, char** argv){
         capture >> srcImage;
       
         resize(srcImage,srcImage,cv::Size(640,480));
-	grayImage = srcImage.clone();
+	    grayImage = srcImage.clone();
         uchar* data_l = srcImage.ptr<uchar>(0);
         uchar* data1_l = grayImage.ptr<uchar>(0);
         ret = write(fd,data_l,640*480*3);
-       if(ret != 0){
+        if(ret != 0){
             printf("write error\n");
         }
 	ret = ioctl(fd,IMAGE_RD_OUTPUT,&coordinate);
@@ -92,9 +92,29 @@ int main(int argc, char** argv){
 	j = sprintf(buffer,"radius:%d",coordinate.radius);
  
 	cv::putText(grayImage, buffer, Point(20,50), cv::FONT_HERSHEY_COMPLEX,2,cv::Scalar(0,0,255),2);
-        cv::circle(grayImage,point,4,cv::Scalar(0,0,255));
+
+    //add x,y axis and spherical center coorinates in the picture 
+    cv::circle(grayImage,point,4,cv::Scalar(0,0,255));
+    cv::circle(grayImage,point,coordinate.radius,cv::Scalar(0,0,255)); //circle
+    cv::arrowedLine(grayImage,Point(0,240),Point(640,240),cv::Scalar(0,0,0),2);  //X
+    cv::arrowedLine(grayImage,Point(320,480),Point(320,0),cv::Scalar(0,0,0),2);  //Y
+    spot1x = coordinate.col+coordinate.radius+10;    //spot 1 and 2 coordinates
+    spot1y = coordinate.row+coordinate.radius+10;
+    spot2x = coordinate.col+coordinate.radius+40;
+    spot2y = coordinate.row+coordinate.radius+10;
+    cv::line(grayImage,Point(coordinate.col,coordinate.row),Point(spot1x,spot1y),cv::Scalar(255,0,0),2);  
+    cv::line(grayImage,Point(spot1x,spot1y),Point(spot2x,spot2y),cv::Scalar(255,0,0),2);
+    char bufferx[10];
+    int w;
+    w = sprintf(bufferx,"x:%d",point.x-320);
+    cv::putText(grayImage,bufferx,Point(spot2x,spot2y),cv::FONT_HERSHEY_COMPLEX,1,cv::Scalar(0,0,255),1); //x coordinates 
+    char buffery[10];
+    int m;
+    m = sprintf(buffery,"y:%d",point.y-240);  
+    cv::putText(grayImage,buffery,Point(spot2x,spot2y+30),cv::FONT_HERSHEY_COMPLEX,1,cv::Scalar(0,0,255),1); //y coordinates
+
 	imshow("a",grayImage);
-        resize(srcImage,srcImage,cv::Size(640,480));
+    resize(srcImage,srcImage,cv::Size(640,480));
 	waitKey(1);
 
 
