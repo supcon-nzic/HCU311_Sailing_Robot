@@ -19,6 +19,9 @@ from pyproj import Proj
 from std_msgs.msg import Float64,Float32
 from sensor_msgs.msg import NavSatFix
 
+import binascii
+from datetime import datetime
+from time import sleep
 
 def trans(s):
     return "b'%s'" % ''.join('\\x%.2x' % x for x in s)
@@ -207,11 +210,21 @@ class Navigation(object):
         return lat, lon
 
 
+serialPort0 = '/dev/ttyPS0'  
+baudRate0 = 9600  
+data_bytes=bytearray()
+
+serialPort5 = '/dev/ttyS5'  
+baudRate5 = 9600  
+
 if __name__ == '__main__':
     con = Connect()
     kl_x = Kl_fit()
     kl_y = Kl_fit()
     NV = Navigation()
+
+    ser1 = serial.Serial(serialPort0, baudRate0)    #open uast5
+    ser2 = serial.Serial(serialPort5, baudRate5)    #open uast5
 
     rospy.init_node('ser_gps_imu',anonymous = True)
     position_pub = rospy.Publisher('position', NavSatFix, queue_size = 10)
@@ -221,6 +234,8 @@ if __name__ == '__main__':
     heading = Float32()
 
     while True:
+        count = ser1.read(600)
+        ser2.write(count)
         while True:
             con.get_data()
             if con.finish == True:
