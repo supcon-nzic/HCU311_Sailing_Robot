@@ -235,7 +235,10 @@ if __name__ == '__main__':
 
     while True:
         count = ser1.read(600)
+        for i in count:
+            print('0x%x'%ord(i))
         ser2.write(count)
+
         while True:
             con.get_data()
             if con.finish == True:
